@@ -99,11 +99,14 @@ jobs:
           pip install --upgrade pip
           pip install pyyaml
 
+      - name: initialize all submodules
+        shell: bash
+        run: git submodule update --init --recursive
+
       # Typical cmake configuration with default generator
       - name: cmake configure
         shell: bash
         run: |
-          git submodule update --init --recursive
           mkdir ${{ env.BUILD_DIR }}
           cd ${{ env.BUILD_DIR }}
           if [ "${{ matrix.name }}" == "macOS-x86_64" ]; then
@@ -114,80 +117,55 @@ jobs:
             cmake -DBUILD_SHARED_LIBS:BOOL=ON -DCMAKE_BUILD_TYPE:STRING=Release -DPYTHON_EXECUTABLE:PATH=`which python3` -DCMAKE_INSTALL_PREFIX:PATH=../pytorch-install ../pytorch_src
           fi;
 
-      # # Build the project
-      # - name: cmake build
-      #   shell: bash
-      #   run: cmake --build ${{ env.BUILD_DIR }} --config ${{ env.BUILD_TYPE }} --parallel ${{ env.CMAKE_BUILD_PARALLEL_LEVEL }}
+      # Build the project
+      - name: cmake build
+        shell: bash
+        run: |
+          mkdir ${{ env.BUILD_DIR }}
+          cd ${{ env.BUILD_DIR }}cmake --build . --target install --parallel ${{ env.CMAKE_BUILD_PARALLEL_LEVEL }}
       
-      # # Declaring the product name and the packaging directory
-      # - name: declare artefact variables
-      #   shell: bash
-      #   run: |
-      #     echo "PACKAGE_DIR=artefacts/${{ env.LIBRARY_NAME }}-${{ matrix.name}}" >> $GITHUB_ENV
-      #     echo "PRODUCT_NAME=${{ env.LIBRARY_NAME }}-${{ matrix.name }}" >> $GITHUB_ENV
+      # Declaring the product name and the packaging directory
+      - name: declare artefact variables
+        shell: bash
+        run: |
+          echo "PACKAGE_DIR=artefacts/${{ env.LIBRARY_NAME }}-${{ matrix.name}}" >> $GITHUB_ENV
+          echo "PRODUCT_NAME=${{ env.LIBRARY_NAME }}-${{ matrix.name }}" >> $GITHUB_ENV
       
-      # # Moving the artefacts to a packaging directory
-      # - name: move artefacts
-      #   shell: bash
-      #   run: |
-      #     mkdir -p ${{ env.PACKAGE_DIR }}
-      #     mkdir -p ${{ env.PACKAGE_DIR }}/include
-      #     mkdir -p ${{ env.PACKAGE_DIR }}/include/tensorflow
-      #     mkdir -p ${{ env.PACKAGE_DIR }}/include/tensorflow/lite
-      #     mkdir -p ${{ env.PACKAGE_DIR }}/include/tensorflow/lite/core
-      #     mkdir -p ${{ env.PACKAGE_DIR }}/include/tensorflow/lite/core/c
-      #     mkdir -p ${{ env.PACKAGE_DIR }}/include/tensorflow/lite/core/async
-      #     mkdir -p ${{ env.PACKAGE_DIR }}/include/tensorflow/lite/core/async/c
-      #     mkdir -p ${{ env.PACKAGE_DIR }}/lib
+      # Moving the artefacts to a packaging directory
+      - name: move artefacts
+        shell: bash
+        run: |
+          mkdir -p ${{ env.PACKAGE_DIR }}
+          mkdir -p ${{ env.PACKAGE_DIR }}/include
+          mkdir -p ${{ env.PACKAGE_DIR }}/lib
+          mkdir -p ${{ env.PACKAGE_DIR }}/bin
+          mkdir -p ${{ env.PACKAGE_DIR }}/share
 
-      #     mv "tensorflow_src/tensorflow/lite/c/c_api.h" ${{ env.PACKAGE_DIR }}/include/tensorflow/lite;
-      #     mv "tensorflow_src/tensorflow/lite/c/c_api_experimental.h" ${{ env.PACKAGE_DIR }}/include/tensorflow/lite;
-      #     mv "tensorflow_src/tensorflow/lite/c/c_api_types.h" ${{ env.PACKAGE_DIR }}/include/tensorflow/lite;
-      #     mv "tensorflow_src/tensorflow/lite/c/common.h" ${{ env.PACKAGE_DIR }}/include/tensorflow/lite;
-      #     mv "tensorflow_src/tensorflow/lite/builtin_ops.h" ${{ env.PACKAGE_DIR }}/include/tensorflow/lite;
-      #     mv "tensorflow_src/tensorflow/lite/core/c/builtin_op_data.h" ${{ env.PACKAGE_DIR }}/include/tensorflow/lite/core/c;
-      #     mv "tensorflow_src/tensorflow/lite/core/c/c_api_experimental.h" ${{ env.PACKAGE_DIR }}/include/tensorflow/lite/core/c;
-      #     mv "tensorflow_src/tensorflow/lite/core/c/c_api_opaque.h" ${{ env.PACKAGE_DIR }}/include/tensorflow/lite/core/c;
-      #     mv "tensorflow_src/tensorflow/lite/core/c/common.h" ${{ env.PACKAGE_DIR }}/include/tensorflow/lite/core/c;
-      #     mv "tensorflow_src/tensorflow/lite/core/c/c_api_types.h" ${{ env.PACKAGE_DIR }}/include/tensorflow/lite/core/c;
-      #     mv "tensorflow_src/tensorflow/lite/core/c/c_api.h" ${{ env.PACKAGE_DIR }}/include/tensorflow/lite/core/c;
-      #     mv "tensorflow_src/tensorflow/lite/core/c/registration_external.h" ${{ env.PACKAGE_DIR }}/include/tensorflow/lite/core/c;
-      #     mv "tensorflow_src/tensorflow/lite/core/async/c/async_kernel.h" ${{ env.PACKAGE_DIR }}/include/tensorflow/lite/core/async/c;
-      #     mv "tensorflow_src/tensorflow/lite/core/async/c/async_signature_runner.h" ${{ env.PACKAGE_DIR }}/include/tensorflow/lite/core/async/c;
-      #     mv "tensorflow_src/tensorflow/lite/core/async/c/internal.h" ${{ env.PACKAGE_DIR }}/include/tensorflow/lite/core/async/c;
-      #     mv "tensorflow_src/tensorflow/lite/core/async/c/task.h" ${{ env.PACKAGE_DIR }}/include/tensorflow/lite/core/async/c;
-      #     mv "tensorflow_src/tensorflow/lite/core/async/c/types.h" ${{ env.PACKAGE_DIR }}/include/tensorflow/lite/core/async/c;
-          
-      #     if [ "${{ matrix.os }}" == "macOS-latest" ]; then
-      #       mv "${{ env.BUILD_DIR }}/libtensorflowlite_c.dylib" ${{ env.PACKAGE_DIR }}/lib;
-      #     elif [ "${{ matrix.name }}" == "Windows" ]; then
-      #       mv "${{ env.BUILD_DIR }}/libtensorflowlite_c.dll" ${{ env.PACKAGE_DIR }}/lib;
-      #     elif [ "${{ matrix.name }}" == "Linux" ]; then
-      #       mv "${{ env.BUILD_DIR }}/libtensorflowlite_c.so" ${{ env.PACKAGE_DIR }}/lib;
-      #     else
-      #       echo "Unknown OS";
-      #     fi;
+          mv pytorch-install/lib/* ${{ env.PACKAGE_DIR }}/lib
+          mv pytorch-install/bin/* ${{ env.PACKAGE_DIR }}/bin
+          mv pytorch-install/include/* ${{ env.PACKAGE_DIR }}/include
+          mv pytorch-install/share/* ${{ env.PACKAGE_DIR }}/share
       
-      # # Zip the artefact
-      # - name: zip artefacts
-      #   working-directory: ${{github.workspace}}/artefacts
-      #   shell: bash
-      #   run: |
-      #     if [ "${{ matrix.os }}" == "macOS-latest" ]; then
-      #       zip -vr ${{ env.PRODUCT_NAME }}.zip ${{ env.PRODUCT_NAME }}/ -x "*.DS_Store"
-      #     elif [ "${{ matrix.name }}" == "Windows" ]; then
-      #       tar -a -c -f ${{ env.PRODUCT_NAME }}.zip ${{ env.PRODUCT_NAME }}/
-      #     elif [ "${{ matrix.name }}" == "Linux" ]; then
-      #       zip -r ${{ env.PRODUCT_NAME }}.zip ${{ env.PRODUCT_NAME }}/
-      #     else
-      #       echo "Unknown OS";
-      #     fi;
-      # 
-      # - name: upload artifact
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: ${{ env.PRODUCT_NAME }}.zip
-      #     path: artefacts/${{ env.PRODUCT_NAME }}.zip
+      # Zip the artefact
+      - name: zip artefacts
+        working-directory: ${{github.workspace}}/artefacts
+        shell: bash
+        run: |
+          if [ "${{ matrix.os }}" == "macOS-latest" ]; then
+            zip -vr ${{ env.PRODUCT_NAME }}.zip ${{ env.PRODUCT_NAME }}/ -x "*.DS_Store"
+          elif [ "${{ matrix.name }}" == "Windows" ]; then
+            tar -a -c -f ${{ env.PRODUCT_NAME }}.zip ${{ env.PRODUCT_NAME }}/
+          elif [ "${{ matrix.name }}" == "Linux" ]; then
+            zip -r ${{ env.PRODUCT_NAME }}.zip ${{ env.PRODUCT_NAME }}/
+          else
+            echo "Unknown OS";
+          fi;
+      
+      - name: upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.PRODUCT_NAME }}.zip
+          path: artefacts/${{ env.PRODUCT_NAME }}.zip
 
   release:
     if: startsWith(github.ref, 'refs/tags/')
