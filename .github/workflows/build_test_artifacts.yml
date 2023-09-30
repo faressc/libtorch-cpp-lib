@@ -99,19 +99,19 @@ jobs:
           pip install --upgrade pip
           pip install pyyaml
 
-      # # Typical cmake configuration with default generator
-      # - name: cmake configure
-      #   shell: bash
-      #   run: |
-      #     mkdir ${{ env.BUILD_DIR }}
-      #     cd ${{ env.BUILD_DIR }}
-      #     if [ "${{ matrix.name }}" == "macOS-x86_64" ]; then
-      #       cmake ../tensorflow_src/tensorflow/lite/c -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_C_COMPILER_LAUNCHER=${{ matrix.ccache }} -DCMAKE_CXX_COMPILER_LAUNCHER=${{ matrix.ccache }} -DCMAKE_OSX_ARCHITECTURES=x86_64
-      #     elif [ "${{ matrix.name }}" == "macOS-arm64" ]; then
-      #       cmake ../tensorflow_src/tensorflow/lite/c -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_C_COMPILER_LAUNCHER=${{ matrix.ccache }} -DCMAKE_CXX_COMPILER_LAUNCHER=${{ matrix.ccache }} -DCMAKE_OSX_ARCHITECTURES=arm64
-      #     else
-      #       cmake ../tensorflow_src/tensorflow/lite/c -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_C_COMPILER_LAUNCHER=${{ matrix.ccache }} -DCMAKE_CXX_COMPILER_LAUNCHER=${{ matrix.ccache }}
-      #     fi;
+      # Typical cmake configuration with default generator
+      - name: cmake configure
+        shell: bash
+        run: |
+          mkdir ${{ env.BUILD_DIR }}
+          cd ${{ env.BUILD_DIR }}
+          if [ "${{ matrix.name }}" == "macOS-x86_64" ]; then
+          cmake -DBUILD_SHARED_LIBS:BOOL=ON -DCMAKE_BUILD_TYPE:STRING=Release -DPYTHON_EXECUTABLE:PATH=`which python3` -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_INSTALL_PREFIX:PATH=../pytorch-install ../pytorch_src
+          elif [ "${{ matrix.name }}" == "macOS-arm64" ]; then
+          cmake -DBUILD_SHARED_LIBS:BOOL=ON -DCMAKE_BUILD_TYPE:STRING=Release -DPYTHON_EXECUTABLE:PATH=`which python3` -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_INSTALL_PREFIX:PATH=../pytorch-install ../pytorch_src
+          else
+            cmake -DBUILD_SHARED_LIBS:BOOL=ON -DCMAKE_BUILD_TYPE:STRING=Release -DPYTHON_EXECUTABLE:PATH=`which python3` -DCMAKE_INSTALL_PREFIX:PATH=../pytorch-install ../pytorch_src
+          fi;
 
       # # Build the project
       # - name: cmake build
