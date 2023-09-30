@@ -96,8 +96,11 @@ jobs:
       - name: install python deps
         shell: bash
         run: |
-          pip install --upgrade pip
-          pip install pyyaml
+        pip install --upgrade pip
+        pip install pyyaml
+        if [ "${{ matrix.name }}" == "Windows" ]; then
+          pip install numpy
+        fi;
 
       - name: initialize all submodules
         shell: bash
@@ -121,8 +124,8 @@ jobs:
       - name: cmake build
         shell: bash
         run: |
-          mkdir ${{ env.BUILD_DIR }}
-          cd ${{ env.BUILD_DIR }}cmake --build . --target install --parallel ${{ env.CMAKE_BUILD_PARALLEL_LEVEL }}
+          cd ${{ env.BUILD_DIR }}
+          cmake --build . --target install --parallel ${{ env.CMAKE_BUILD_PARALLEL_LEVEL }}
       
       # Declaring the product name and the packaging directory
       - name: declare artefact variables
