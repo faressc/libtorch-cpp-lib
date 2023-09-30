@@ -103,6 +103,7 @@ jobs:
       - name: cmake configure
         shell: bash
         run: |
+          git submodule update --init --recursive
           mkdir ${{ env.BUILD_DIR }}
           cd ${{ env.BUILD_DIR }}
           if [ "${{ matrix.name }}" == "macOS-x86_64" ]; then
