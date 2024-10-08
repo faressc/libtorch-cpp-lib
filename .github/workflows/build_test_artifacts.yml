@@ -92,7 +92,7 @@ jobs:
                 shell: bash
                 run: |
                     pip install --upgrade pip
-                    pip install pyyaml pybind11
+                    pip install pyyaml pybind11 typing-extensions
                     if [ "${{ matrix.name }}" == "Windows-x86_64" ]; then
                         pip install numpy
                     fi;
