@@ -108,11 +108,11 @@ jobs:
                     mkdir ${{ env.BUILD_DIR }}
                     cd ${{ env.BUILD_DIR }}
                     if [ "${{ matrix.name }}" == "macOS-x86_64" ]; then
-                        cmake -DBUILD_SHARED_LIBS:BOOL=ON -DCMAKE_BUILD_TYPE:STRING=Release -DPYTHON_EXECUTABLE:PATH=`which python3` -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache -DCMAKE_INSTALL_PREFIX:PATH=../pytorch-install ../pytorch_src
+                        cmake -DBUILD_SHARED_LIBS:BOOL=ON -DCMAKE_BUILD_TYPE:STRING=Release -DPYTHON_EXECUTABLE:PATH=`which python3` -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache -DCMAKE_INSTALL_PREFIX:PATH=../pytorch-install ../pytorch
                     elif [ "${{ matrix.name }}" == "macOS-arm64" ]; then
-                        cmake -DBUILD_SHARED_LIBS:BOOL=ON -DCMAKE_BUILD_TYPE:STRING=Release -DPYTHON_EXECUTABLE:PATH=`which python3` -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache -DCMAKE_INSTALL_PREFIX:PATH=../pytorch-install ../pytorch_src
+                        cmake -DBUILD_SHARED_LIBS:BOOL=ON -DCMAKE_BUILD_TYPE:STRING=Release -DPYTHON_EXECUTABLE:PATH=`which python3` -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache -DCMAKE_INSTALL_PREFIX:PATH=../pytorch-install ../pytorch
                     else
-                        cmake -DBUILD_SHARED_LIBS:BOOL=ON -DCMAKE_BUILD_TYPE:STRING=Release -DPYTHON_EXECUTABLE:PATH=`which python3` -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache -DCMAKE_INSTALL_PREFIX:PATH=../pytorch-install ../pytorch_src
+                        cmake -DBUILD_SHARED_LIBS:BOOL=ON -DCMAKE_BUILD_TYPE:STRING=Release -DPYTHON_EXECUTABLE:PATH=`which python3` -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache -DCMAKE_INSTALL_PREFIX:PATH=../pytorch-install ../pytorch
                     fi;
 
             # Build the project
