@@ -163,7 +163,6 @@ jobs:
 
             # Zip the artefact
             -   name: zip artefacts
-                working-directory: ${{github.workspace}}/artefacts
                 shell: bash
                 run: |
                     if [ "${{ matrix.os }}" == "macOS-latest" ]; then
