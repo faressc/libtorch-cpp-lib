@@ -157,9 +157,9 @@ jobs:
             -   name: codesign (macOS)
                 if: ${{ matrix.os == 'macOS-latest' }}
                 run: |
-                    codesign --force -s "${{ secrets.DEV_ID_APP }}" -v "${{ env.PACKAGE_DIR }}/lib/*" --deep --strict --options=runtime --timestamp;
+                    codesign --force -s "${{ secrets.DEV_ID_APP }}" -v ${{ env.PACKAGE_DIR }}/lib/* --deep --strict --options=runtime --timestamp;
                     # Here we check the code signitures
-                    codesign -dv --verbose=4 "${{ env.PACKAGE_DIR }}/lib/*";
+                    codesign -dv --verbose=4 ${{ env.PACKAGE_DIR }}/lib/*;
 
             # Zip the artefact
             -   name: zip artefacts
